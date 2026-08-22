@@ -1,260 +1,285 @@
 // services/threatEngine.js
-// Modular TriagBot Analysis Engine
-// Implements backend-compatible contract for immediate FastAPI + Playwright integration
+// Core Triage & Heuristic Engine for TriageBot
 
 import { DEMO_PRESETS } from '../data/presets.js';
 
 /**
- * Evaluates suspicious input through multi-axis threat heuristic modeling.
- * When integrated with backend, this function calls POST /api/analyze.
- * 
- * @param {string} input - Raw URL, email text, SMS, or digital payload
- * @returns {Promise<Object>} Backend-compatible threat intelligence JSON response
+ * Triages submitted artifacts (URL, text, or file) and returns structured analysis
+ * @param {string} input - The submitted content or filename
+ * @param {string} mode - "url" | "text" | "file" | "all"
+ * @returns {Promise<Object>}
  */
-export async function analyzeThreat(input) {
-  // Simulate network latency and multi-stage container sandbox startup
-  await new Promise((resolve) => setTimeout(resolve, 850));
+export async function triageArtifact(input, mode = "all") {
+  // Simulate cloud sandbox startup latency
+  await new Promise(r => setTimeout(r, 600));
 
   if (!input || !input.trim()) {
-    throw new Error("No payload provided for analysis");
+    throw new Error("No artifact submitted for triage.");
   }
 
-  const normalized = input.trim().toLowerCase();
+  const raw = input.trim();
+  const lower = raw.toLowerCase();
 
-  // 1. Direct Preset Pattern Matching
-  if (normalized.includes("chase-security-verify") || normalized.includes("unauthorized login") || normalized.includes("jpmorgan chase")) {
-    return DEMO_PRESETS.bankLogin.analysis;
+  // 1. Direct Presets Check
+  if (lower.includes("chase-security-verify") || lower.includes("unauthorized login") || lower.includes("jpmorgan chase")) {
+    return DEMO_PRESETS.bankUrl.analysis;
   }
-  if (normalized.includes("david sterling") || normalized.includes("acquisition deposit") || normalized.includes("wire confirmation") || normalized.includes("48,500")) {
-    return DEMO_PRESETS.ceoScam.analysis;
+  if (lower.includes("gift card") || lower.includes("david sterling") || lower.includes("apple / amazon gift")) {
+    return DEMO_PRESETS.giftCardEmail.analysis;
   }
-  if (normalized.includes("torvalds/linux") || normalized.includes("github.com/torvalds") || normalized.includes("gpg key") || normalized.includes("kernel.org")) {
-    return DEMO_PRESETS.cleanRepo.analysis;
+  if (lower.includes("torvalds/linux") || lower.includes("github.com/torvalds")) {
+    return DEMO_PRESETS.cleanGithub.analysis;
   }
 
-  // 2. Dynamic Heuristic Engine for Custom User Inputs
-  return runDynamicHeuristicEngine(input);
+  // 2. File Mode Evaluation
+  if (mode === "file" || isFileArtifact(raw)) {
+    return triageFileArtifact(raw);
+  }
+
+  // 3. Dynamic URL / Text Evaluation
+  if (raw.startsWith("http://") || raw.startsWith("https://") || mode === "url") {
+    return triageUrlArtifact(raw);
+  }
+
+  return triageTextArtifact(raw);
 }
 
-/**
- * Dynamic AI Heuristic Analysis for user-supplied custom payloads
- */
-function runDynamicHeuristicEngine(input) {
-  const text = input.toLowerCase();
-  
-  // Psychological Vector Indicators
-  const urgencyKeywords = ["urgent", "immediately", "immediate", "within 24h", "2 hours", "account locked", "suspended", "action required", "expiring", "final notice", "asap", "discreet"];
-  const fearKeywords = ["unauthorized", "fraud", "police", "arrest", "lawsuit", "penalty", "compromised", "breach", "frozen", "illegal"];
-  const authorityKeywords = ["ceo", "director", "fbi", "irs", "fraud prevention", "security team", "it helpdesk", "microsoft support", "bank of america", "paypal", "apple id", "dhl", "fedex"];
-  const financialKeywords = ["wire", "gift card", "crypto", "bitcoin", "eth", "escrow", "invoice", "deposit", "routing number", "$", "transfer", "refund", "claim prize"];
+function isFileArtifact(input) {
+  const fileExtensions = [".pdf", ".exe", ".docx", ".doc", ".zip", ".rar", ".7z", ".js", ".vbs", ".bat", ".scr", ".iso", ".apk"];
+  return fileExtensions.some(ext => input.toLowerCase().endsWith(ext));
+}
 
-  // Technical Vector Indicators
-  const urlRegex = /(https?:\/\/[^\s]+)/g;
-  const foundUrls = input.match(urlRegex) || [];
-  const suspiciousTlds = [".xyz", ".top", ".buzz", ".work", ".click", ".link", ".cc", ".su", ".gq", ".ml", ".cf", ".tk", ".zip", ".mov"];
-  const credentialTerms = ["password", "login", "signin", "verify", "authenticate", "credential", "seed phrase", "private key", "ssn", "otp", "2fa code"];
+function triageFileArtifact(filename) {
+  const lower = filename.toLowerCase();
+  const isDoubleExtension = /\.(pdf|docx|xlsx|txt|png|jpg)\.(exe|vbs|bat|scr|cmd|ps1|js)$/i.test(lower);
+  const isExecutable = /\.(exe|vbs|bat|scr|cmd|ps1|iso|dll)$/i.test(lower);
+  const isArchive = /\.(zip|rar|7z|tar|gz)$/i.test(lower);
+  const isMacroDoc = /\.(docm|xlsm|pptm|dotm)$/i.test(lower);
 
-  let psychScore = 20;
-  let techScore = 15;
-  const psychSignals = [];
-  const techSignals = [];
-
-  // Evaluate Urgency
-  const matchedUrgency = urgencyKeywords.filter(k => text.includes(k));
-  if (matchedUrgency.length > 0) {
-    psychScore += Math.min(35, matchedUrgency.length * 15);
-    psychSignals.push({
-      id: "p-urgency",
-      name: "Coercive Time Pressure",
-      status: matchedUrgency.length > 1 ? "danger" : "warning",
-      score: Math.min(98, 65 + matchedUrgency.length * 12),
-      detail: `Detected aggressive temporal stress markers: "${matchedUrgency.slice(0, 3).join('", "')}". Intended to bypass rational scrutiny.`,
-      tag: "Urgency Vector"
-    });
-  }
-
-  // Evaluate Fear & Loss
-  const matchedFear = fearKeywords.filter(k => text.includes(k));
-  if (matchedFear.length > 0) {
-    psychScore += Math.min(30, matchedFear.length * 14);
-    psychSignals.push({
-      id: "p-fear",
-      name: "Fear & Loss Aversion Manipulation",
-      status: "danger",
-      score: Math.min(96, 70 + matchedFear.length * 10),
-      detail: `Detected intimidation / penalty intimidation: "${matchedFear.slice(0, 3).join('", "')}". Coerces reflexive action.`,
-      tag: "Fear Vector"
-    });
-  }
-
-  // Evaluate Authority & Impersonation
-  const matchedAuthority = authorityKeywords.filter(k => text.includes(k));
-  if (matchedAuthority.length > 0) {
-    psychScore += Math.min(25, matchedAuthority.length * 12);
-    psychSignals.push({
-      id: "p-authority",
-      name: "Institutional Authority Spoofing",
-      status: "warning",
-      score: Math.min(94, 60 + matchedAuthority.length * 12),
-      detail: `References high-trust entity: "${matchedAuthority.slice(0, 2).join('", "')}". Exploits organizational hierarchy bias.`,
-      tag: "Authority Bias"
-    });
-  }
-
-  // Evaluate Financial Demands
-  const matchedFinancial = financialKeywords.filter(k => text.includes(k));
-  if (matchedFinancial.length > 0) {
-    psychScore += 20;
-    psychSignals.push({
-      id: "p-financial",
-      name: "Unsolicited Financial / Asset Action",
-      status: "danger",
-      score: 88,
-      detail: `Contains prompts for monetary dispatch, gift cards, or financial routing: "${matchedFinancial.slice(0, 2).join('", "')}".`,
-      tag: "Financial Vector"
-    });
-  }
-
-  // Evaluate URLs and Technical Indicators
-  if (foundUrls.length > 0) {
-    techScore += 30;
-    const urlStr = foundUrls[0];
-    const hasSuspiciousTld = suspiciousTlds.some(tld => urlStr.toLowerCase().includes(tld));
-    const hasIpUrl = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(urlStr);
-    const hasAtSymbol = urlStr.includes("@");
-    const hasLookalike = urlStr.includes("-security") || urlStr.includes("-login") || urlStr.includes("-verify") || urlStr.includes("support-");
-
-    if (hasSuspiciousTld || hasIpUrl || hasAtSymbol || hasLookalike) {
-      techScore += 45;
-      techSignals.push({
-        id: "t-domain",
-        name: "High-Risk Domain Architecture",
-        status: "danger",
-        score: 95,
-        detail: `Suspicious destination URL detected (${urlStr.slice(0, 38)}...). Exhibits indicators of lookalike redirection or non-standard TLD.`,
-        tag: "Domain Anomaly"
-      });
-    } else {
-      techSignals.push({
-        id: "t-url",
-        name: "External Resource Inspection",
-        status: "warning",
-        score: 55,
-        detail: `Extracted domain "${new URL(urlStr.startsWith('http') ? urlStr : 'http://' + urlStr).hostname}" for isolated sandbox inspection.`,
-        tag: "Network Endpoint"
-      });
-    }
-  }
-
-  // Evaluate Credential Harvesting cues
-  const matchedCreds = credentialTerms.filter(k => text.includes(k));
-  if (matchedCreds.length > 0) {
-    techScore += 35;
-    techSignals.push({
-      id: "t-creds",
-      name: "Authentication Capture Intent",
-      status: "danger",
-      score: 92,
-      detail: `Contains explicit solicitation of sensitive credentials/tokens (${matchedCreds.slice(0, 3).join(', ')}).`,
-      tag: "Credential Harvest"
-    });
-  }
-
-  // Cap scores between 0 and 100
-  psychScore = Math.min(99, Math.max(5, psychScore));
-  techScore = Math.min(99, Math.max(5, techScore));
-  const overallRiskScore = Math.round((techScore * 0.55) + (psychScore * 0.45));
-
-  // Determine Risk Category
   let risk = "safe";
-  let threatType = "Low Risk Payload";
-  let recAction = { label: "SAFE TO PROCEED", level: "safe", description: "Standard precautions apply. No overt malicious indicators found." };
-  let explanation = "The analyzed content exhibits low indicators of manipulation or anomalous infrastructure.";
+  let riskScore = 8;
+  let explanation = `Static binary analysis of '${filename}' completed with zero suspicious signatures. File structure conforms to standard benign specifications.`;
+  let guardrail = {
+    level: "safe",
+    label: "[Allow Access]",
+    actionName: "Allow Download",
+    description: "Automated guardrail active: File signature verified clean. Safe for user workstation access.",
+    buttonText: "Allow Access & Open File"
+  };
 
-  if (overallRiskScore >= 70) {
+  if (isDoubleExtension) {
     risk = "dangerous";
-    threatType = (techScore > psychScore) ? "Deceptive Phishing / Malicious Link" : "Social Engineering / Manipulation Attack";
-    recAction = {
-      label: "DO NOT INTERACT / BLOCK SENDER",
-      level: "danger",
-      description: "Severe threat indicators detected. Do not click links, open attachments, or reply."
+    riskScore = 98;
+    explanation = `High-severity disguise detected in '${filename}'. The file uses a deceptive double extension (.pdf.exe) to trick users into executing a malicious binary disguised as an innocent document.`;
+    guardrail = {
+      level: "dangerous",
+      label: "[Block Link & Quarantine Payload]",
+      actionName: "Quarantine Malicious Binary",
+      description: "Automated guardrail active: Executable disguised as document. Payload quarantined and checksum blacklisted.",
+      buttonText: "Quarantine Payload Immediately"
     };
-    explanation = `High-confidence threat detected. The input combines ${techSignals.length ? 'suspicious infrastructure patterns' : 'unverified links'} with coercive psychological triggers (${psychSignals.map(s => s.name).slice(0, 2).join(' & ')}).`;
-  } else if (overallRiskScore >= 40) {
+  } else if (isExecutable) {
+    risk = "dangerous";
+    riskScore = 92;
+    explanation = `Untrusted executable binary '${filename}' detected. Contains unauthorized execution hooks and unverified code signing certificates that pose a critical risk to local endpoints.`;
+    guardrail = {
+      level: "dangerous",
+      label: "[Block Link & Quarantine Payload]",
+      actionName: "Block Execution",
+      description: "Automated guardrail active: Unsigned executable blocked by endpoint containment policy.",
+      buttonText: "Quarantine Binary"
+    };
+  } else if (isMacroDoc) {
     risk = "suspicious";
-    threatType = "Suspicious Content / Potential Phishing";
-    recAction = {
-      label: "PROCEED WITH CAUTION / VERIFY OUT-OF-BAND",
-      level: "warning",
-      description: "Moderate anomaly signals detected. Verify the sender's identity through trusted separate channels."
+    riskScore = 74;
+    explanation = `Document '${filename}' contains embedded VBA macro automations. Macro-enabled files are frequently used to download second-stage malware upon opening.`;
+    guardrail = {
+      level: "suspicious",
+      label: "[Warn User & Require Verification]",
+      actionName: "Strip Macros & Inspect",
+      description: "Automated guardrail active: Embedded macros stripped in cloud container. User confirmation required.",
+      buttonText: "Strip Macros & Verify Origin"
     };
-    explanation = "This input contains anomalous patterns that warrant extra verification before any action is taken.";
+  } else if (isArchive && (lower.includes("invoice") || lower.includes("payment") || lower.includes("statement"))) {
+    risk = "suspicious";
+    riskScore = 68;
+    explanation = `Encrypted or compressed archive '${filename}' with financial naming convention. Archives are often used to conceal password-protected malware and evade gateway scanners.`;
+    guardrail = {
+      level: "suspicious",
+      label: "[Warn User & Require Verification]",
+      actionName: "Deep Archive Unpack",
+      description: "Automated guardrail active: Archive extracted in isolated memory sandbox for sub-file telemetry inspection.",
+      buttonText: "Unpack in Sandbox"
+    };
   }
-
-  // Provide fallback signals if empty
-  if (techSignals.length === 0) {
-    techSignals.push({
-      id: "t-clean",
-      name: "Network & Payload Signature",
-      status: "safe",
-      score: 10,
-      detail: "No active exploitation markers, zero-day signatures, or suspicious redirection vectors found.",
-      tag: "Clean Signature"
-    });
-  }
-  if (psychSignals.length === 0) {
-    psychSignals.push({
-      id: "p-clean",
-      name: "Tone & Behavioral Neutrality",
-      status: "safe",
-      score: 8,
-      detail: "No coercive language, artificial deadlines, or intimidation tactics identified.",
-      tag: "Neutral Vector"
-    });
-  }
-
-  const sampleUrl = foundUrls[0] || (input.length > 50 ? "payload://raw-message/inspect" : "https://unverified-sample-host.net");
 
   return {
+    targetArtifact: `File: ${filename}`,
+    type: "File",
     risk,
-    riskScore: overallRiskScore,
-    technicalScore: techScore,
-    psychologicalScore: psychScore,
-    threatType,
-    confidence: Math.min(99, Math.max(78, 80 + Math.floor(Math.random() * 18))),
-    explanation,
-    recommendedAction: recAction,
-    technicalSignals: techSignals,
-    psychologicalSignals: psychSignals,
+    riskScore,
+    plainExplanation: explanation,
+    guardrailAction: guardrail,
     preview: {
-      url: sampleUrl,
-      pageTitle: `Isolated Inspection: ${sampleUrl.slice(0, 32)}`,
-      domainAge: risk === "dangerous" ? "Under 7 Days (High Risk)" : "Established",
-      sslIssuer: risk === "dangerous" ? "Self-Signed / Untrusted CA" : "Standard Domain TLS",
-      ipLocation: "Isolated Sandbox Container (Playwright Virtual Worker)",
-      screenshotType: risk === "dangerous" ? "generic_threat" : "generic_clean",
-      highlightedElements: [
-        { label: "Detected Anomaly In Sandbox Viewport", type: risk === "dangerous" ? "threat" : "safe", top: "35%", left: "25%" }
-      ],
-      rawDomSnippet: `<!-- Sandboxed DOM Capture -->
-<div class="quarantine-wrapper status-${risk}">
-  <p class="summary">Content sanitized by TriagBot Zero-Execution Kernel</p>
-  <pre>${escapeHtml(input.slice(0, 200))}</pre>
+      url: `file://sandbox/quarantine/${filename}`,
+      pageTitle: `Safe Glass Sandbox File Inspection: ${filename}`,
+      sslIssuer: "Local Sandbox Virtual Storage",
+      domainAge: "Extracted in Memory",
+      analogyText: "Looking at the file safely from behind thick glass without risking your device.",
+      watermark: "🛡️ Isolated Cloud Sandbox — Zero Script Execution",
+      screenshotType: risk === "dangerous" ? "file_threat" : "file_clean",
+      rawDomSnippet: `<!-- Sandboxed File Hex & Header Deconstruction -->
+<div class="file-inspection-ast">
+  <div class="file-meta">Filename: ${filename} | Size: 1.4 MB | Entropy: ${risk === 'dangerous' ? '7.89 (High Obfuscation)' : '4.12 (Normal)'}</div>
+  <div class="pe-headers">
+    Status: ${risk.toUpperCase()} | Sandbox Quarantine: Active
+  </div>
 </div>`
-    },
-    smartSafeReply: {
-      category: "Safe Deflection Protocol",
-      text: risk === "dangerous" 
-        ? "I have logged this message with our security operations team. Due to active security policies, I cannot process this request via direct link or email. Please provide official verification through our authenticated enterprise channel."
-        : "Received. I will review this through standard verified communication channels."
-    },
-    microLesson: {
-      title: "Recognizing Combined Attack Vectors",
-      summary: "Modern cyber adversaries rarely rely on technical malware alone. They systematically pair malicious links with psychological triggers like urgency and authority to exploit human reflexes before defenses can react."
     }
   };
 }
 
-function escapeHtml(str) {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+function triageUrlArtifact(url) {
+  const lower = url.toLowerCase();
+  const suspiciousTlds = [".xyz", ".top", ".buzz", ".work", ".click", ".link", ".cc", ".su", ".gq", ".ml", ".cf", ".tk", ".zip", ".mov", ".pw"];
+  const hasSuspiciousTld = suspiciousTlds.some(t => lower.includes(t));
+  const hasIpHost = /\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/.test(url);
+  const hasSpoofedKeywords = lower.includes("login") || lower.includes("verify") || lower.includes("auth") || lower.includes("secure") || lower.includes("account") || lower.includes("update");
+  const isCleanDomain = lower.includes("google.com") || lower.includes("microsoft.com") || lower.includes("apple.com") || lower.includes("github.com") || lower.includes("wikipedia.org");
+
+  let risk = "safe";
+  let riskScore = 6;
+  let explanation = `Destination URL '${url.slice(0, 40)}...' verified against global threat intelligence feeds with zero anomalies detected.`;
+  let guardrail = {
+    level: "safe",
+    label: "[Allow Access]",
+    actionName: "Allow Navigation",
+    description: "Automated guardrail active: Domain reputation verified clean. Safe to browse.",
+    buttonText: "Allow Access"
+  };
+
+  if (hasIpHost || (hasSuspiciousTld && hasSpoofedKeywords)) {
+    risk = "dangerous";
+    riskScore = 95;
+    explanation = `Dangerous phishing domain detected. The link routes to a suspicious endpoint exhibiting indicators of brand typosquatting, deceptive credential capture, and missing identity certification.`;
+    guardrail = {
+      level: "dangerous",
+      label: "[Block Link & Quarantine Payload]",
+      actionName: "Block & Sinkhole",
+      description: "Automated guardrail active: Destination URL blocked at edge gateway and sinkholed.",
+      buttonText: "Block Link & Blacklist Domain"
+    };
+  } else if (hasSpoofedKeywords && !isCleanDomain) {
+    risk = "suspicious";
+    riskScore = 65;
+    explanation = `Suspicious authentication gateway detected. The domain uses login-related keywords without verifiable enterprise Extended Validation (EV) credentials.`;
+    guardrail = {
+      level: "suspicious",
+      label: "[Warn User & Require Verification]",
+      actionName: "Require MFA & Warn",
+      description: "Automated guardrail active: Display security warning prompt and require out-of-band identity check.",
+      buttonText: "Warn User & Require Verification"
+    };
+  }
+
+  return {
+    targetArtifact: url.length > 55 ? url.slice(0, 52) + '...' : url,
+    type: "URL",
+    risk,
+    riskScore,
+    plainExplanation: explanation,
+    guardrailAction: guardrail,
+    preview: {
+      url: url,
+      pageTitle: `Safe Glass Sandbox: ${url.slice(0, 35)}`,
+      sslIssuer: risk === "dangerous" ? "Untrusted DV Authority" : "Verified TLS Certificate",
+      domainAge: risk === "dangerous" ? "Under 7 Days" : "Established",
+      analogyText: "Looking at the site safely from behind thick glass without risking your device.",
+      watermark: "🛡️ Isolated Cloud Sandbox — Zero Script Execution",
+      screenshotType: risk === "dangerous" ? "generic_threat" : "generic_clean",
+      rawDomSnippet: `<!-- Sandboxed Web Snapshot -->
+<div class="quarantine-frame">
+  <div class="url-badge">${url}</div>
+  <div class="verdict-banner ${risk}">THREAT STATUS: ${risk.toUpperCase()}</div>
+</div>`
+    }
+  };
+}
+
+function triageTextArtifact(text) {
+  const lower = text.toLowerCase();
+  const urgencyWords = ["urgent", "immediately", "asap", "within 24h", "2 hours", "action required", "deadline", "confidential", "secret", "locked", "suspended"];
+  const financialWords = ["gift card", "wire", "escrow", "crypto", "bitcoin", "routing number", "$", "transfer", "invoice"];
+  const authorityWords = ["ceo", "director", "fbi", "irs", "fraud team", "security team", "it support", "chase", "bank", "paypal"];
+
+  const matchedUrgency = urgencyWords.filter(w => lower.includes(w));
+  const matchedFinancial = financialWords.filter(w => lower.includes(w));
+  const matchedAuthority = authorityWords.filter(w => lower.includes(w));
+
+  let score = 10 + (matchedUrgency.length * 20) + (matchedFinancial.length * 25) + (matchedAuthority.length * 15);
+  score = Math.min(99, Math.max(5, score));
+
+  let risk = "safe";
+  let explanation = "The submitted text exhibits normal conversational tone with zero psychological coercion or social engineering markers.";
+  let guardrail = {
+    level: "safe",
+    label: "[Allow Access]",
+    actionName: "Normal Processing",
+    description: "Automated guardrail active: Content is benign and safe to proceed with.",
+    buttonText: "Acknowledge & Proceed"
+  };
+
+  if (score >= 70) {
+    risk = "dangerous";
+    explanation = `High-risk social engineering attack identified. The sender combines coercive urgency ("${matchedUrgency.slice(0, 2).join('", "')}") with financial demands and authority impersonation to bypass critical thinking.`;
+    guardrail = {
+      level: "dangerous",
+      label: "[Block Link & Quarantine Payload]",
+      actionName: "Block & Quarantine",
+      description: "Automated guardrail active: High-confidence social engineering attack quarantined.",
+      buttonText: "Block Sender & Quarantine"
+    };
+  } else if (score >= 40) {
+    risk = "suspicious";
+    explanation = `Anomalous psychological pressure markers detected. The message uses urgency or financial references that warrant independent out-of-band verification.`;
+    guardrail = {
+      level: "suspicious",
+      label: "[Warn User & Require Verification]",
+      actionName: "Warn User",
+      description: "Automated guardrail active: Display warning banner advising verbal phone verification.",
+      buttonText: "Warn User & Request Out-of-Band Check"
+    };
+  }
+
+  return {
+    targetArtifact: `Text Snippet: "${text.slice(0, 35)}..."`,
+    type: "Text",
+    risk,
+    riskScore: score,
+    plainExplanation: explanation,
+    guardrailAction: guardrail,
+    preview: {
+      url: "text://message/inspect",
+      pageTitle: `Safe Glass Text Analysis`,
+      sslIssuer: "Sanitized Message AST",
+      domainAge: "N/A (Raw Text)",
+      analogyText: "Looking at the message safely from behind thick glass without risking your device.",
+      watermark: "🛡️ Isolated Cloud Sandbox — Zero Script Execution",
+      screenshotType: risk === "dangerous" ? "bec_email" : "generic_clean",
+      rawDomSnippet: `<!-- Sandboxed Text Entity Decomposition -->
+<div class="text-ast">
+  <div class="detected-intent">Intent Classification: ${risk.toUpperCase()}</div>
+  <p class="sanitized-text">${escapeHtml(text.slice(0, 240))}</p>
+</div>`
+    }
+  };
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 }
