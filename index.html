@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TriagBot — AI-Powered Threat Triage & Zero-Execution Analysis</title>
+  <meta name="description" content="TriagBot neutralizes cybersecurity threats before they touch your device through dual-axis technical anomaly and psychological manipulation analysis." />
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyber: {
+              bg: '#0B0F19',
+              navy: '#0F172A',
+              card: 'rgba(15, 23, 42, 0.75)',
+              border: 'rgba(255, 255, 255, 0.08)',
+              cyan: '#00f0ff',
+              emerald: '#10b981',
+              amber: '#f59e0b',
+              red: '#ef4444'
+            }
+          },
+          fontFamily: {
+            heading: ['Space Grotesk', 'sans-serif'],
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="bg-[#0B0F19] text-slate-100 antialiased min-h-screen relative selection:bg-cyan-500 selection:text-black">
+
+  <!-- Dynamic Cyber Background Canvas -->
+  <canvas id="cyber-canvas"></canvas>
+  <div class="cyber-grid-overlay"></div>
+  <div class="radial-glow-top"></div>
+
+  <!-- Sticky Glassmorphism Header -->
+  <header id="main-header" class="sticky top-0 z-50 transition-all duration-300 border-b border-white/5 bg-[#0B0F19]/80 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="#" class="flex items-center gap-3.5 group">
+        <div class="relative w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500/20 to-blue-600/30 border border-cyan-400/40 flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.25)] group-hover:shadow-[0_0_25px_rgba(0,240,255,0.5)] transition-all">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-cyan-400"></i>
+          <span class="absolute inset-0 rounded-xl border border-cyan-300/40 animate-ping opacity-25"></span>
+        </div>
+        <div class="flex flex-col">
+          <div class="flex items-center gap-2">
+            <span class="font-heading font-bold text-xl tracking-tight text-white group-hover:text-cyan-300 transition-colors">TriagBot<span class="text-cyan-400 font-extrabold">.AI</span></span>
+          </div>
+          <span class="text-[10px] font-mono tracking-wider text-cyan-400/80 uppercase font-semibold">AI THREAT TRIAGE</span>
+        </div>
+      </a>
+
+      <!-- Desktop Navigation -->
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#how-it-works" class="text-sm font-medium text-slate-300 hover:text-cyan-300 transition-colors">How It Works</a>
+        <a href="#features" class="text-sm font-medium text-slate-300 hover:text-cyan-300 transition-colors">Features</a>
+        <a href="#pipeline" class="text-sm font-medium text-slate-300 hover:text-cyan-300 transition-colors">Pipeline</a>
+        <a href="#scanner-section" class="text-sm font-medium text-slate-300 hover:text-cyan-300 transition-colors">Live Scanner</a>
+      </nav>
+
+      <!-- Right Action & Telemetry Status -->
+      <div class="flex items-center gap-4">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/40 border border-emerald-500/30 text-emerald-400 text-xs font-mono">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 pulsing-dot"></span>
+          <span>AI Engine Online</span>
+        </div>
+        <a href="#scanner-section" class="btn-cyber-primary px-5 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 cursor-pointer shadow-lg">
+          <i data-lucide="crosshair" class="w-4 h-4"></i>
+          <span>Launch Scanner</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-12 pb-16 md:pt-20 md:pb-24 overflow-hidden z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      
+      <!-- Top Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyan-950/50 border border-cyan-500/30 text-cyan-300 text-xs font-mono tracking-wide uppercase mb-8 shadow-[0_0_20px_rgba(0,240,255,0.15)] animate-pulse">
+        <i data-lucide="shield-check" class="w-3.5 h-3.5 text-cyan-400"></i>
+        <span>AI-POWERED CYBERSECURITY</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="font-heading font-extrabold text-4xl sm:text-6xl lg:text-7xl tracking-tight text-white max-w-5xl mx-auto leading-[1.1] mb-6">
+        Neutralize Threats <br class="hidden sm:inline" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-teal-300 to-emerald-400 drop-shadow-[0_0_35px_rgba(0,240,255,0.3)]">
+          Before They Touch Your Device.
+        </span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="text-slate-300 text-base sm:text-xl max-w-3xl mx-auto leading-relaxed mb-10 font-normal">
+        TriagBot analyzes suspicious messages, links, emails, and digital content using technical anomaly detection and psychological manipulation analysis — before you interact with them.
+      </p>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+        <a href="#scanner-section" class="w-full sm:w-auto btn-cyber-primary px-8 py-4 rounded-xl text-base font-bold flex items-center justify-center gap-3">
+          <i data-lucide="shield-search" class="w-5 h-5"></i>
+          <span>Launch Threat Scanner</span>
+        </a>
+        <a href="#pipeline" class="w-full sm:w-auto btn-cyber-secondary px-8 py-4 rounded-xl text-base font-semibold flex items-center justify-center gap-2">
+          <span>Explore How It Works</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <!-- Trust Line -->
+      <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-6 text-xs sm:text-sm text-slate-400 font-mono">
+        <span class="flex items-center gap-1.5"><i data-lucide="lock" class="w-3.5 h-3.5 text-cyan-400"></i> Zero-Execution Analysis</span>
+        <span class="text-slate-600 hidden sm:inline">•</span>
+        <span class="flex items-center gap-1.5"><i data-lucide="brain-circuit" class="w-3.5 h-3.5 text-cyan-400"></i> AI-Powered Triage</span>
+        <span class="text-slate-600 hidden sm:inline">•</span>
+        <span class="flex items-center gap-1.5"><i data-lucide="eye" class="w-3.5 h-3.5 text-cyan-400"></i> Safe Preview</span>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Interactive Threat Scanner Section -->
+  <section id="scanner-section" class="relative py-10 z-20 scroll-mt-24">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Main Glassmorphism Scanner Panel -->
+      <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/10 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] backdrop-blur-xl">
+        
+        <!-- Scanner Header -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 rounded-lg bg-cyan-950/60 border border-cyan-400/30 text-cyan-400">
+              <i data-lucide="radar" class="w-6 h-6 animate-spin" style="animation-duration: 12s;"></i>
+            </div>
+            <div>
+              <h2 class="font-heading font-bold text-xl text-white flex items-center gap-2">
+                Threat Intelligence Scanner
+                <span class="text-xs px-2 py-0.5 rounded bg-cyan-900/40 text-cyan-300 font-mono border border-cyan-500/20">v1.4</span>
+              </h2>
+              <p class="text-xs text-slate-400">Sandboxed multi-vector anomaly & cognitive manipulation engine</p>
+            </div>
+          </div>
+
+          <!-- Status Indicator -->
+          <div id="scanner-status-pill" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-slate-700 text-xs font-mono text-slate-300 self-start sm:self-auto">
+            <span id="scanner-status-dot" class="w-2 h-2 rounded-full bg-emerald-400 pulsing-dot"></span>
+            <span id="scanner-status-text">● Ready to Analyze</span>
+          </div>
+        </div>
+
+        <!-- Quick Test Buttons -->
+        <div class="pt-6 pb-4">
+          <div class="flex items-center justify-between mb-3">
+            <span class="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Quick-Test Scenarios:
+            </span>
+            <span class="text-[11px] text-slate-500 font-mono hidden sm:inline">Click to auto-populate & analyze</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <button id="preset-bank" type="button" class="preset-btn text-left p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-red-500/30 hover:border-red-500 text-xs transition-all group flex items-start gap-3">
+              <div class="p-1.5 rounded-lg bg-red-950/60 text-red-400 mt-0.5 group-hover:scale-110 transition-transform">
+                <i data-lucide="shield-alert" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-white group-hover:text-red-300 transition-colors flex items-center justify-between">
+                  <span>Spoofed Bank Login</span>
+                  <span class="text-[10px] text-red-400 font-mono">DANGER</span>
+                </div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">Phishing & Credential Theft</div>
+              </div>
+            </button>
+
+            <button id="preset-ceo" type="button" class="preset-btn text-left p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-amber-500/30 hover:border-amber-500 text-xs transition-all group flex items-start gap-3">
+              <div class="p-1.5 rounded-lg bg-amber-950/60 text-amber-400 mt-0.5 group-hover:scale-110 transition-transform">
+                <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-white group-hover:text-amber-300 transition-colors flex items-center justify-between">
+                  <span>Urgent CEO Scam</span>
+                  <span class="text-[10px] text-amber-400 font-mono">DANGER</span>
+                </div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">BEC Social Engineering</div>
+              </div>
+            </button>
+
+            <button id="preset-clean" type="button" class="preset-btn text-left p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-emerald-500/30 hover:border-emerald-500 text-xs transition-all group flex items-start gap-3">
+              <div class="p-1.5 rounded-lg bg-emerald-950/60 text-emerald-400 mt-0.5 group-hover:scale-110 transition-transform">
+                <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="font-bold text-white group-hover:text-emerald-300 transition-colors flex items-center justify-between">
+                  <span>Clean Repo (Safe)</span>
+                  <span class="text-[10px] text-emerald-400 font-mono">SAFE</span>
+                </div>
+                <div class="text-[11px] text-slate-400 truncate mt-0.5">Verified Linux Mainline</div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="mt-4 relative">
+          <div class="relative rounded-xl overflow-hidden">
+            <textarea
+              id="threat-input"
+              rows="5"
+              class="glass-input w-full p-4 text-sm font-mono placeholder:text-slate-500 resize-y rounded-xl focus:ring-2 focus:ring-cyan-400/40"
+              placeholder="Paste a suspicious URL, email, message, or digital content..."
+            ></textarea>
+            
+            <!-- Bottom Toolbar inside input -->
+            <div class="flex items-center justify-between px-3 py-2 bg-slate-950/80 border-t border-white/5 text-[11px] text-slate-400 font-mono">
+              <div class="flex items-center gap-3">
+                <span id="char-count">0 characters</span>
+                <span class="text-slate-600">|</span>
+                <span class="hidden sm:inline text-slate-400">Zero-Execution Sandbox Active</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button id="clear-input-btn" type="button" class="hover:text-slate-200 transition-colors px-2 py-0.5 rounded bg-slate-800/50">Clear</button>
+                <button id="paste-sample-btn" type="button" class="hover:text-cyan-300 text-cyan-400 transition-colors px-2 py-0.5 rounded bg-cyan-950/50 border border-cyan-500/20">Sample URL</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Trigger -->
+        <div class="mt-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2 text-xs text-slate-400">
+            <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+            <span>No client-side execution • Privacy safe</span>
+          </div>
+
+          <button
+            id="analyze-btn"
+            type="button"
+            class="btn-cyber-primary w-full sm:w-auto px-8 py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-3 shadow-xl"
+          >
+            <i data-lucide="shield-alert" id="analyze-btn-icon" class="w-4 h-4"></i>
+            <span id="analyze-btn-text">Analyze Threat</span>
+          </button>
+        </div>
+
+        <!-- Animated Progress / Step Feed (Shown during analysis) -->
+        <div id="scan-telemetry-feed" class="hidden mt-6 p-4 rounded-xl bg-slate-950/90 border border-cyan-500/30 font-mono text-xs text-cyan-300 space-y-2">
+          <div class="flex items-center justify-between text-slate-400 pb-2 border-b border-cyan-900/40">
+            <span class="flex items-center gap-2">
+              <i data-lucide="cpu" class="w-4 h-4 text-cyan-400 animate-spin"></i>
+              <span>SANDBOX TRIAGE PIPELINE</span>
+            </span>
+            <span id="scan-step-timer" class="text-cyan-400 font-bold">0.0s</span>
+          </div>
+          <div id="scan-steps-list" class="space-y-1 text-slate-300 text-[11px]">
+            <!-- Steps injected via JS -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Live Result Panel (Reveals dynamically after scan) -->
+  <section id="result-panel" class="relative py-12 z-20 hidden scroll-mt-20">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+      
+      <!-- 1. Risk Status Header Banner -->
+      <div id="result-card" class="glass-panel rounded-2xl p-6 sm:p-8 border transition-all duration-500 theme-dangerous">
+        
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-6 border-b border-white/10">
+          
+          <!-- Left: Risk Category Badge & Type -->
+          <div class="space-y-2">
+            <div class="flex items-center gap-3 flex-wrap">
+              <span id="risk-status-badge" class="px-4 py-1.5 rounded-full text-xs font-mono font-extrabold tracking-wider uppercase bg-red-950 text-red-300 border border-red-500/50 shadow-[0_0_20px_rgba(239,68,68,0.4)] flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-red-500 pulsing-dot"></span>
+                <span id="risk-badge-text">DANGEROUS</span>
+              </span>
+              <span id="threat-type-badge" class="px-3 py-1 rounded-full text-xs font-mono bg-slate-800/80 text-slate-200 border border-slate-700">
+                Credential Phishing
+              </span>
+              <span id="confidence-badge" class="text-xs font-mono text-cyan-300 bg-cyan-950/40 px-2.5 py-1 rounded border border-cyan-500/20">
+                97% Confidence
+              </span>
+            </div>
+            <h3 id="result-main-title" class="font-heading font-bold text-2xl sm:text-3xl text-white tracking-tight">
+              High-Risk Phishing Vector Detected
+            </h3>
+          </div>
+
+          <!-- Right: Animated Score Circle / Pill -->
+          <div class="flex items-center gap-4 bg-slate-950/80 p-4 rounded-xl border border-white/10 self-start lg:self-auto">
+            <div class="text-right">
+              <div class="text-[11px] font-mono uppercase text-slate-400">Composite Risk Score</div>
+              <div class="flex items-baseline justify-end gap-1">
+                <span id="animated-risk-score" class="font-heading font-extrabold text-4xl text-red-400">0</span>
+                <span class="text-sm font-mono text-slate-500">/ 100</span>
+              </div>
+            </div>
+            <div id="risk-meter-icon" class="w-12 h-12 rounded-xl bg-red-950/60 border border-red-500/40 flex items-center justify-center text-red-400 shadow-[0_0_20px_rgba(239,68,68,0.3)]">
+              <i data-lucide="alert-octagon" class="w-7 h-7"></i>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- 2. Dual-Axis AI Scoring Matrix -->
+        <div class="pt-6 space-y-6">
+          <div>
+            <h4 class="font-heading font-bold text-lg text-white flex items-center gap-2">
+              <i data-lucide="binary" class="w-5 h-5 text-cyan-400"></i>
+              Dual-Axis Threat Intelligence
+            </h4>
+            <p class="text-xs text-slate-400 mt-1">Multi-signal algorithmic decomposition comparing technical code anomalies against psychological manipulation tactics.</p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Axis 1: Technical Anomaly Score -->
+            <div class="p-5 rounded-xl bg-slate-950/60 border border-white/10 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="code-2" class="w-4 h-4 text-cyan-400"></i>
+                  <span class="text-sm font-bold text-slate-200">Technical Anomaly Score</span>
+                </div>
+                <span id="tech-score-num" class="font-mono font-bold text-sm text-cyan-400">88 / 100</span>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="w-full h-3 rounded-full bg-slate-900 border border-white/5 overflow-hidden">
+                <div id="tech-score-bar" class="progress-bar-fill h-full bg-gradient-to-r from-cyan-500 to-red-500 rounded-full w-0"></div>
+              </div>
+
+              <!-- Signal Breakdowns -->
+              <div id="tech-signals-list" class="space-y-2 pt-2 text-xs">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+            <!-- Axis 2: Psychological Manipulation Score -->
+            <div class="p-5 rounded-xl bg-slate-950/60 border border-white/10 space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="brain" class="w-4 h-4 text-amber-400"></i>
+                  <span class="text-sm font-bold text-slate-200">Psychological Manipulation Score</span>
+                </div>
+                <span id="psych-score-num" class="font-mono font-bold text-sm text-amber-400">96 / 100</span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="w-full h-3 rounded-full bg-slate-900 border border-white/5 overflow-hidden">
+                <div id="psych-score-bar" class="progress-bar-fill h-full bg-gradient-to-r from-amber-500 to-red-600 rounded-full w-0"></div>
+              </div>
+
+              <!-- Signal Breakdowns -->
+              <div id="psych-signals-list" class="space-y-2 pt-2 text-xs">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. Safe Glass Window (Sandboxed Virtual Browser) -->
+        <div class="pt-8 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h4 class="font-heading font-bold text-lg text-white">Safe Glass Window</h4>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-mono uppercase bg-cyan-950/80 text-cyan-300 border border-cyan-500/30">
+                  Isolated • Zero Execution • Read Only
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">Rendered inside isolated headless sandbox. No scripts, downloads, or active content touch your device.</p>
+            </div>
+
+            <!-- View Tabs -->
+            <div class="flex items-center gap-1 p-1 rounded-lg bg-slate-900 border border-white/10 self-start sm:self-auto text-xs font-mono">
+              <button id="tab-visual-preview" type="button" class="px-3 py-1 rounded-md bg-cyan-950 text-cyan-300 font-bold border border-cyan-500/30">Visual Sandbox</button>
+              <button id="tab-dom-inspector" type="button" class="px-3 py-1 rounded-md text-slate-400 hover:text-slate-200 transition-colors">DOM Snapshot</button>
+            </div>
+          </div>
+
+          <!-- Sandboxed Window Frame -->
+          <div class="safe-glass-container relative rounded-xl border border-cyan-500/30 bg-[#070b14] overflow-hidden shadow-2xl">
+            
+            <!-- Laser Scan Line -->
+            <div class="laser-scanner-line"></div>
+            <div class="scanline-overlay"></div>
+            <div class="watermark-safe">ZERO-EXECUTION PREVIEW</div>
+
+            <!-- Fake Browser Chrome Header -->
+            <div class="px-4 py-3 bg-slate-950/90 border-b border-white/10 flex items-center justify-between gap-4 z-30 relative">
+              <!-- Window dots -->
+              <div class="flex items-center gap-2">
+                <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+                <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+              </div>
+
+              <!-- URL Bar -->
+              <div class="flex-1 max-w-2xl px-3.5 py-1.5 rounded-lg bg-slate-900 border border-white/10 flex items-center justify-between text-xs font-mono">
+                <div class="flex items-center gap-2 truncate">
+                  <i data-lucide="shield-alert" id="sandbox-url-icon" class="w-3.5 h-3.5 text-red-400 shrink-0"></i>
+                  <span id="sandbox-url-text" class="text-slate-300 truncate">https://chase-security-verify.net/auth/login</span>
+                </div>
+                <span id="sandbox-ssl-badge" class="text-[10px] text-red-400 font-bold shrink-0 ml-2">UNTRUSTED SSL</span>
+              </div>
+
+              <!-- Sandbox Controls -->
+              <div class="flex items-center gap-2 text-slate-400 text-xs font-mono">
+                <span class="hidden md:inline px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px] text-cyan-400">Playwright Kernel</span>
+              </div>
+            </div>
+
+            <!-- Sandbox Viewport 1: Visual Mode -->
+            <div id="sandbox-visual-viewport" class="p-6 sm:p-8 min-h-[300px] relative z-20 flex flex-col justify-center items-center">
+              
+              <div id="sandbox-mock-render" class="w-full max-w-2xl rounded-xl bg-slate-900/90 border border-slate-800 p-6 shadow-xl relative">
+                <!-- Rendered elements inserted dynamically -->
+              </div>
+
+              <!-- Threat Inspector Notice -->
+              <div class="mt-4 flex items-center gap-2 text-[11px] font-mono text-cyan-300/80 bg-slate-950/80 px-3.5 py-1.5 rounded-full border border-cyan-500/20">
+                <i data-lucide="crosshair" class="w-3.5 h-3.5 text-cyan-400"></i>
+                <span>Threat Inspector Active: Deceptive & high-risk DOM components highlighted</span>
+              </div>
+            </div>
+
+            <!-- Sandbox Viewport 2: Sanitized DOM Mode (hidden by default) -->
+            <div id="sandbox-dom-viewport" class="p-6 min-h-[300px] hidden relative z-20">
+              <pre id="sandbox-raw-dom" class="font-mono text-xs text-emerald-400 bg-slate-950 p-4 rounded-xl border border-slate-800 overflow-x-auto max-h-80 leading-relaxed"></pre>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 4. Plain-Language Threat Explanation & Action -->
+        <div class="pt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Human Explanation (2 cols) -->
+          <div class="lg:col-span-2 p-6 rounded-xl bg-slate-950/80 border border-white/10 space-y-4">
+            <div class="flex items-center gap-2">
+              <div class="p-2 rounded-lg bg-cyan-950 border border-cyan-500/30 text-cyan-400">
+                <i data-lucide="message-square-warning" class="w-5 h-5"></i>
+              </div>
+              <h4 class="font-heading font-bold text-lg text-white">What’s Really Happening?</h4>
+            </div>
+            
+            <p id="plain-explanation-text" class="text-sm sm:text-base text-slate-300 leading-relaxed">
+              This message looks like a legitimate banking alert, but the sender is using urgency and brand impersonation to push you into entering your credentials. The safest action is to close the page and access your bank through its official app.
+            </p>
+
+            <!-- Recommended Action Card -->
+            <div id="recommended-action-box" class="p-4 rounded-xl bg-red-950/40 border border-red-500/40 flex items-start gap-4">
+              <div class="p-2 rounded-lg bg-red-900/60 text-red-400 shrink-0">
+                <i data-lucide="shield-x" id="rec-action-icon" class="w-6 h-6"></i>
+              </div>
+              <div>
+                <div class="text-xs font-mono uppercase tracking-wider text-red-400 font-bold" id="rec-action-label">RECOMMENDED ACTION</div>
+                <div class="text-sm font-bold text-white mt-0.5" id="rec-action-title">DO NOT CLICK OR SUBMIT CREDENTIALS</div>
+                <p class="text-xs text-slate-300 mt-1" id="rec-action-desc">
+                  Do not click the link or provide any information. Open your banking mobile app directly or navigate manually to the official bank URL.
+                </p>
+              </div>
+            </div>
+
+            <!-- Smart Safe Reply Generator -->
+            <div class="pt-2">
+              <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-mono text-cyan-300 flex items-center gap-1.5">
+                  <i data-lucide="bot" class="w-3.5 h-3.5"></i> Smart Safe Reply (AI-Drafted Response):
+                </span>
+                <button id="copy-safe-reply-btn" type="button" class="text-[11px] text-cyan-400 hover:text-cyan-200 font-mono flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-950 border border-cyan-500/30 transition-colors">
+                  <i data-lucide="copy" class="w-3 h-3"></i>
+                  <span id="copy-reply-text">Copy Reply</span>
+                </button>
+              </div>
+              <div id="smart-safe-reply-box" class="p-3.5 rounded-lg bg-slate-900/90 border border-cyan-500/20 text-xs text-slate-300 font-mono leading-relaxed">
+                <!-- Injected via JS -->
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Micro-Learning Moment (1 col) -->
+          <div class="p-6 rounded-xl bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-white/10 flex flex-col justify-between space-y-4">
+            <div>
+              <div class="flex items-center gap-2 mb-3">
+                <div class="p-1.5 rounded-lg bg-amber-950/60 text-amber-400 border border-amber-500/20">
+                  <i data-lucide="lightbulb" class="w-4 h-4"></i>
+                </div>
+                <span class="text-xs font-mono uppercase tracking-wider text-amber-400 font-bold">Micro-Learning Moment</span>
+              </div>
+              
+              <h5 id="micro-lesson-title" class="font-heading font-bold text-base text-white mb-2">
+                The Lookalike Domain & Countdown Trap
+              </h5>
+              
+              <p id="micro-lesson-desc" class="text-xs text-slate-300 leading-relaxed">
+                Legitimate financial institutions NEVER enforce a 2-hour countdown via email or direct you to domains containing hyphenated add-ons like 'chase-security-verify.net'. Always open your browser and manually navigate to the known, trusted domain.
+              </p>
+            </div>
+
+            <!-- Export & Action Bar -->
+            <div class="pt-4 border-t border-white/10 flex flex-col gap-2">
+              <button id="export-json-btn" type="button" class="w-full btn-cyber-secondary py-2.5 rounded-lg text-xs font-mono font-semibold flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                <span>Export Incident Bundle (.JSON)</span>
+              </button>
+              <button id="new-scan-btn" type="button" class="w-full py-2 rounded-lg text-xs font-mono text-slate-400 hover:text-cyan-300 transition-colors flex items-center justify-center gap-1.5">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Scan Another Target</span>
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Feature Grid Section -->
+  <section id="features" class="relative py-20 z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/20 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-4">
+          Next-Generation Defense
+        </div>
+        <h2 class="font-heading font-extrabold text-3xl sm:text-4xl text-white tracking-tight">
+          Engineered for Decisive Cyber Triage
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-3">
+          Every layer of TriagBot is purpose-built to isolate risks before execution, explain threats in plain human terms, and empower zero-friction defense.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        
+        <!-- Feature 1 -->
+        <div class="glass-panel-interactive rounded-2xl p-6 relative group flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-cyan-950/70 border border-cyan-400/30 flex items-center justify-center text-cyan-400 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(0,240,255,0.4)] transition-all">
+              <i data-lucide="eye" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">
+              Safe Glass Window
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Inspect suspicious content without executing it on your device. Zero scripts, zero cookies, 100% containment.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs font-mono text-cyan-400 group-hover:translate-x-1 transition-transform">
+            <span>Explore Sandbox</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass-panel-interactive rounded-2xl p-6 relative group flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-purple-950/70 border border-purple-400/30 flex items-center justify-center text-purple-400 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(168,85,247,0.4)] transition-all">
+              <i data-lucide="sliders" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg text-white group-hover:text-purple-300 transition-colors">
+              Dual-Axis AI Scoring
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Detect both technical anomalies and human manipulation tactics across dual independent intelligence engines.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs font-mono text-purple-400 group-hover:translate-x-1 transition-transform">
+            <span>View Scoring Model</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass-panel-interactive rounded-2xl p-6 relative group flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-emerald-950/70 border border-emerald-400/30 flex items-center justify-center text-emerald-400 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all">
+              <i data-lucide="message-square-code" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">
+              Smart Safe Reply
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Generate a safe, professional response without interacting with the attacker or compromising sensitive credentials.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs font-mono text-emerald-400 group-hover:translate-x-1 transition-transform">
+            <span>Review Deflections</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-panel-interactive rounded-2xl p-6 relative group flex flex-col justify-between">
+          <div class="space-y-4">
+            <div class="w-12 h-12 rounded-xl bg-amber-950/70 border border-amber-400/30 flex items-center justify-center text-amber-400 group-hover:scale-110 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all">
+              <i data-lucide="sparkles" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-heading font-bold text-lg text-white group-hover:text-amber-300 transition-colors">
+              Micro-Learning Moments
+            </h3>
+            <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">
+              Turn every detected threat into a quick cybersecurity lesson to train your intuitive threat recognition over time.
+            </p>
+          </div>
+          <div class="mt-6 flex items-center gap-2 text-xs font-mono text-amber-400 group-hover:translate-x-1 transition-transform">
+            <span>Learn More</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Pipeline Architecture Section -->
+  <section id="pipeline" class="relative py-20 z-10 bg-slate-950/50 border-y border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/60 border border-cyan-500/20 text-cyan-400 text-xs font-mono uppercase tracking-wider mb-4">
+          End-To-End Architecture
+        </div>
+        <h2 class="font-heading font-extrabold text-3xl sm:text-5xl text-white tracking-tight">
+          From Suspicion to Safe Decision
+        </h2>
+        <p class="text-slate-400 text-sm sm:text-base mt-3">
+          How TriagBot orchestrates isolated browser sandboxing and dual-axis cognitive reasoning.
+        </p>
+      </div>
+
+      <!-- Horizontal 3-Stage Pipeline -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 relative">
+        
+        <!-- Stage 01 -->
+        <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/10 relative overflow-hidden group">
+          <div class="text-xs font-mono text-cyan-400 font-extrabold tracking-widest mb-4 flex items-center justify-between">
+            <span>01 — INGESTION</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-950 text-[10px] border border-cyan-500/30">STAGE 1</span>
+          </div>
+
+          <div class="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-500/30 flex items-center justify-center text-cyan-400 mb-6">
+            <i data-lucide="file-input" class="w-6 h-6"></i>
+          </div>
+
+          <h3 class="font-heading font-bold text-xl text-white mb-2">
+            Multi-Format Ingestion
+          </h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
+            Input → Suspicious URLs, raw email headers, SMS messages, digital QR codes, or pasted snippets.
+          </p>
+
+          <div class="pt-4 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-cyan-300">
+            <i data-lucide="shield-check" class="w-4 h-4"></i>
+            <span>Zero Execution Guarantee</span>
+          </div>
+        </div>
+
+        <!-- Stage 02 -->
+        <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-cyan-500/40 relative overflow-hidden group shadow-[0_0_30px_rgba(0,240,255,0.15)]">
+          <div class="text-xs font-mono text-cyan-400 font-extrabold tracking-widest mb-4 flex items-center justify-between">
+            <span>02 — SANDBOX + AI ANALYSIS</span>
+            <span class="px-2 py-0.5 rounded bg-cyan-900/60 text-[10px] border border-cyan-400/50">STAGE 2</span>
+          </div>
+
+          <div class="w-12 h-12 rounded-xl bg-cyan-950/60 border border-cyan-400/50 flex items-center justify-center text-cyan-300 mb-6 shadow-[0_0_20px_rgba(0,240,255,0.3)]">
+            <i data-lucide="cpu" class="w-6 h-6 animate-pulse"></i>
+          </div>
+
+          <h3 class="font-heading font-bold text-xl text-white mb-2">
+            Playwright Sandbox + LLM Reasoning
+          </h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
+            Headless browser virtualization captures DOM artifacts and network traces while cognitive AI parses social engineering manipulation.
+          </p>
+
+          <div class="pt-4 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-cyan-300">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            <span>Multi-Signal Analysis</span>
+          </div>
+        </div>
+
+        <!-- Stage 03 -->
+        <div class="glass-panel rounded-2xl p-6 sm:p-8 border border-white/10 relative overflow-hidden group">
+          <div class="text-xs font-mono text-emerald-400 font-extrabold tracking-widest mb-4 flex items-center justify-between">
+            <span>03 — TRIAGE + SAFE PREVIEW</span>
+            <span class="px-2 py-0.5 rounded bg-emerald-950 text-[10px] border border-emerald-500/30">STAGE 3</span>
+          </div>
+
+          <div class="w-12 h-12 rounded-xl bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-6">
+            <i data-lucide="check-check" class="w-6 h-6"></i>
+          </div>
+
+          <h3 class="font-heading font-bold text-xl text-white mb-2">
+            Triage & Safe Preview
+          </h3>
+          <p class="text-slate-400 text-xs sm:text-sm leading-relaxed mb-6">
+            Risk Score + Plain-Language Explanation + Safe Glass preview + 1-Click deflection response.
+          </p>
+
+          <div class="pt-4 border-t border-white/10 flex items-center gap-2 text-xs font-mono text-emerald-400">
+            <i data-lucide="user-check" class="w-4 h-4"></i>
+            <span>Human-Friendly Decision</span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Trust / Security Strip -->
+  <section class="py-12 relative z-10 border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        
+        <div class="p-4 rounded-xl bg-slate-900/40 border border-white/5 flex flex-col items-center gap-2">
+          <i data-lucide="lock" class="w-6 h-6 text-cyan-400"></i>
+          <span class="font-heading font-bold text-sm text-white">Zero-Execution Analysis</span>
+          <span class="text-xs text-slate-400">Zero client code execution</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/40 border border-white/5 flex flex-col items-center gap-2">
+          <i data-lucide="brain" class="w-6 h-6 text-cyan-400"></i>
+          <span class="font-heading font-bold text-sm text-white">AI-Powered Reasoning</span>
+          <span class="text-xs text-slate-400">Cognitive threat analysis</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/40 border border-white/5 flex flex-col items-center gap-2">
+          <i data-lucide="shield" class="w-6 h-6 text-emerald-400"></i>
+          <span class="font-heading font-bold text-sm text-white">Privacy First</span>
+          <span class="text-xs text-slate-400">Sanitized memory disposal</span>
+        </div>
+
+        <div class="p-4 rounded-xl bg-slate-900/40 border border-white/5 flex flex-col items-center gap-2">
+          <i data-lucide="zap" class="w-6 h-6 text-amber-400"></i>
+          <span class="font-heading font-bold text-sm text-white">Real-Time Triage</span>
+          <span class="text-xs text-slate-400">Sub-second threat scoring</span>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="relative py-24 z-10 overflow-hidden">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative">
+      
+      <!-- Glowing Shield Aura -->
+      <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="glass-panel rounded-3xl p-8 sm:p-14 border border-cyan-500/30 relative shadow-[0_0_80px_rgba(0,240,255,0.15)]">
+        
+        <div class="w-16 h-16 rounded-2xl bg-cyan-950/80 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mx-auto mb-6 shadow-[0_0_30px_rgba(0,240,255,0.3)]">
+          <i data-lucide="shield-alert" class="w-8 h-8"></i>
+        </div>
+
+        <h2 class="font-heading font-extrabold text-3xl sm:text-5xl text-white tracking-tight mb-4">
+          Think It’s Suspicious? <br />
+          <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">Let TriagBot Think First.</span>
+        </h2>
+
+        <p class="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto mb-8 leading-relaxed">
+          Safely triage any digital content in seconds before taking high-stakes actions on your workstation or mobile device.
+        </p>
+
+        <a href="#scanner-section" class="btn-cyber-primary px-9 py-4 rounded-xl text-base font-bold inline-flex items-center gap-3 shadow-2xl">
+          <span>Launch Threat Scanner</span>
+          <i data-lucide="arrow-right" class="w-5 h-5"></i>
+        </a>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="relative z-10 border-t border-white/10 bg-[#070b13] py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-lg bg-cyan-950 border border-cyan-500/30 flex items-center justify-center text-cyan-400">
+            <i data-lucide="shield-alert" class="w-4 h-4"></i>
+          </div>
+          <div>
+            <span class="font-heading font-bold text-lg text-white">TriagBot<span class="text-cyan-400">.AI</span></span>
+            <p class="text-xs text-slate-400">AI-powered threat triage for safer digital decisions.</p>
+          </div>
+        </div>
+
+        <!-- Links -->
+        <div class="flex items-center gap-6 text-xs text-slate-400 font-mono">
+          <a href="#scanner-section" class="hover:text-cyan-300 transition-colors">Product</a>
+          <a href="#features" class="hover:text-cyan-300 transition-colors">Features</a>
+          <a href="#pipeline" class="hover:text-cyan-300 transition-colors">How It Works</a>
+          <a href="#pipeline" class="hover:text-cyan-300 transition-colors">Security</a>
+        </div>
+
+        <!-- Copyright / Architecture readiness -->
+        <div class="text-xs text-slate-500 font-mono text-center md:text-right">
+          <div>Built for safer digital interactions.</div>
+          <div class="text-[10px] text-slate-600 mt-0.5">FastAPI & Playwright Sandbox Compatible</div>
+        </div>
+
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification element -->
+  <div id="cyber-toast" class="toast-cyber flex items-center gap-3">
+    <i data-lucide="check-circle" class="w-5 h-5 text-cyan-400"></i>
+    <span id="toast-message" class="text-xs font-mono text-white">Triage report copied to clipboard.</span>
+  </div>
+
+  <!-- Application Logic -->
+  <script src="./app.js"></script>
+
+</body>
+</html>
